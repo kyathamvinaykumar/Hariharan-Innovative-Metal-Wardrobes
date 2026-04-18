@@ -59,6 +59,18 @@
     // Prevent body scroll when menu open
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
+  
+  // Mobile Dropdown Toggle
+  const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+  dropdownToggles.forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const parent = toggle.closest('.mobile-nav-item.dropdown');
+      const menu = parent.querySelector('.mobile-dropdown-menu');
+      const isActive = toggle.classList.toggle('active');
+      menu.classList.toggle('open', isActive);
+    });
+  });
 
   function closeMenu() {
     mobileMenu.classList.remove('open');
@@ -208,7 +220,7 @@
   lightbox.appendChild(lbClose);
   document.body.appendChild(lightbox);
 
-  function openLightbox(src, alt) {
+  window.openLightbox = function(src, alt) {
     lbImg.src  = src;
     lbImg.alt  = alt || '';
     lightbox.style.display = 'flex';
@@ -291,19 +303,23 @@
       btnShowMore.textContent = 'Loading...';
       btnShowMore.style.pointerEvents = 'none';
 
-      // The exact files uploaded by the user in the "gallary" folder:
+      // The exact files uploaded by the user in the "gallary" folder (optimized):
       const gallaryFiles = [
-        "123.jpg", "2.jpg", "202.jpg", "22.jpg", "222.jpg", "6.jpg", "7.jpg",
-        "IMG-20200812-WA0040.jpg", "IMG_0472.jpg", "NYJB6075.jpg", 
-        "Screenshot_20220520-105537_WhatsAppBusiness.jpg", "Screenshot_20220520-105546_WhatsAppBusiness.jpg", 
-        "T4R.jpg", "WhatsApp Image 2026-01-30 at 11.53.03 AM.jpeg", "dfear copy.jpg", "dfqawqd copy.jpg", 
-        "efe (1).jpg", "efe (2).jpg", "efe (4).jpg", "fawe.jpg", "fawrdi copy.jpg", "fef.jpg", 
-        "ggggggggg.jpg", "q.jpg", "ttttttttttttt.jpg", "uuuuuuuuuuu.jpg", "vse.jpg", 
-        "wdcwe copy.jpg", "wefwed copy.jpg"
+        "123.webp", "2.webp", "202.webp", "22.webp", "222.webp", "6.webp",
+        "dfear copy.webp", "dfqawqd copy.webp", "efe (1).webp", "efe (2).webp", 
+        "efe (4).webp", "fawe.webp", "fawrdi copy.webp", "fef.webp", 
+        "ggggggggg.webp", "IMG-20200812-WA0040.webp", "NYJB6075.webp", "q.webp", 
+        "Screenshot_20220520-105537_WhatsAppBusiness.webp", "Screenshot_20220520-105546_WhatsAppBusiness.webp", 
+        "T4R.webp", "ttttttttttttt.webp", "uuuuuuuuuuu.webp", "vse.webp", 
+        "wdcwe copy.webp", "wefwed copy.webp", "WhatsApp Image 2026-01-30 at 11.53.03 AM.webp",
+        "WhatsApp Image 2026-04-18 at 1.01.09 PM (2).webp", "WhatsApp Image 2026-04-18 at 1.01.11 PM (2).webp",
+        "WhatsApp Image 2026-04-18 at 1.01.22 PM (1).webp", "WhatsApp Image 2026-04-18 at 1.01.35 PM (1).webp",
+        "WhatsApp Image 2026-04-18 at 1.01.35 PM (2).webp"
       ];
 
-      // Slice to skip the first 6 files we already loaded in HTML
-      const remainingFiles = gallaryFiles.slice(6);
+      // Use a Set to handle potential duplicates and ensure we don't reload featured images
+      const featuredInHtml = ["123.webp", "2.webp", "202.webp", "22.webp", "222.webp", "6.webp", "dfear copy.webp", "dfqawqd copy.webp"];
+      const remainingFiles = gallaryFiles.filter(f => !featuredInHtml.includes(f));
 
       remainingFiles.forEach((filename, i) => {
         const div = document.createElement('div');
@@ -314,6 +330,8 @@
         imgEl.alt = `Gallery Item ${i + 7}`;
         imgEl.src = `gallary/${filename}`;
         imgEl.loading = 'lazy';
+        imgEl.width = 800; // Standardize for gallery
+        imgEl.height = 600;
         imgEl.decoding = 'async'; // Offloads decoding off main-thread to fix lag
         
         // Add zoom overlay
